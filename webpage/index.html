@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Quality</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Air Quality</h1>
+    </header>
+
+    <main>
+        <div class="controls">
+            <label for="date">Base time</label>
+            <input type="date" id="date">
+
+            <label for="parameter">Parameter:</label>
+            <select id="parameter">
+                <option value="pm25">PM2.5</option>
+                <option value="pm10">PM10</option>
+            </select>
+
+            <label for="source">Area:</label>
+            <select id="source">
+                <option value="source1">Source 1</option>
+                <option value="source2">Source 2</option>
+            </select>
+        </div>
+
+        <div class="map-container">
+            <img id="forecast-map" src="data/heatmap-01.png" alt="Forecast map here">
+            <div class="current-time">
+                <span id="hour-display">01</span>
+            </div>
+            <div class="timeline-controls">
+                <button id="toggle-play">Start</button>
+                <div id="timestep-container">
+                </div>
+            </div>
+            <div class="legend">
+                <p><strong>Legend</strong></p>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
