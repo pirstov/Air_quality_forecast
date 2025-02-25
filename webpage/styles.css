@@ -34,13 +34,27 @@ label {
 }
 
 #forecast-map {
-    max-width: 100%;
+    max-width: 300px;
+    max-height: 290px;
     height: auto;
+}
+
+#forecast-map img {
+    max-height: 100%;
+    max-width: 100%;
 }
 
 .timeline-controls {
     margin-top: 10px;
-    display: inline-block; /* Row display */
+    display: inline-block;/* Row display */
+}
+
+.timestep-container {
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 
 button {
