@@ -12,6 +12,7 @@ const toggleBtn = document.getElementById("toggle-play");
 const timeSlider = document.getElementById("time-slider");
 const currentTime = document.getElementById("current-time");
 const datePicker = document.getElementById("date");
+const hourDisplay = document.getElementById("hour-display");
 
 
 // Update dates in datepicker
@@ -39,10 +40,13 @@ timeSlider.max = images.length - 1;
 timeSlider.step = 1;
 console.log("images.length:", images.length);
 
+// Initialize hour display
+hourDisplay.textContent = currentHour.toString().padStart(2, "0");
+
 // Functions
 function updateMap() {
     forecastMap.src = images[currentHour];
-    document.getElementById("hour-display").textContent=(currentHour + 1).toString().padStart(2, "0");
+    hourDisplay.textContent = currentHour.toString().padStart(2, "0");
     console.log("current time:", currentHour, "image src: ", images[currentHour])
 }
 
