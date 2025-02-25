@@ -10,7 +10,7 @@ body {
 
 header {
     background: #55bfd0;
-    color: white;
+    color: #f4f4f4;
     width: 100%;
     text-align: center;
     padding: 15px 0;
@@ -61,7 +61,7 @@ button {
     padding: 8px 15px;
     font-size: 16px;
     background: #55bfd0;
-    color: white;
+    color: #f4f4f4;
     border: none;
     cursor: pointer;
 }
@@ -81,3 +81,36 @@ button:hover {
     border: none;
     cursor: pointer;
 }
+
+
+/* Navigation bar */
+
+/* Add a background color to the top navigation */
+.topnav {
+    background-color: #55bfd0;
+    overflow: hidden;
+  }
+
+/* Style the links inside the navigation bar */
+.topnav a {
+float: left;
+color: #f4f4f4;
+text-align: center;
+padding: 14px 16px;
+text-decoration: none;
+font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+background-color: #005bb5;
+color: #f4f4f4;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+background-color: #005bb5;
+color: #f4f4f4;
+}
+
+/* */

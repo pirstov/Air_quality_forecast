@@ -1,8 +1,8 @@
 // Variables
-let isAnimating = false; // TODO: implement animation
+let isAnimating = false;
 //let isLooping = false; // TODO: ???
-let currentHour = 0; // TODO: Start from the current hour
-let totHours = 24; // TODO: Decide how far to forecast
+let currentHour = 0; // TODO: Start from the current hour?
+let totHours = 24; // TODO: determine from the selection, default to 3-day forecast?
 let images = [];
 let interval = null; // Function that repeatedly calls updateMap
 
@@ -15,8 +15,8 @@ const datePicker = document.getElementById("date");
 const hourDisplay = document.getElementById("hour-display");
 
 
-// Update dates in datepicker
-// TODO: fetch the data and show dates based on the data
+// Initialize dates in datepicker
+// TODO: fetch the data and show dates based on the data, later just list of dates?
 currentDate = new Date();
 datePicker.value = currentDate.toISOString().split("T")[0];
 startOfWeek = new Date();
@@ -47,12 +47,13 @@ hourDisplay.textContent = currentHour.toString().padStart(2, "0");
 function updateMap() {
     forecastMap.src = images[currentHour];
     hourDisplay.textContent = currentHour.toString().padStart(2, "0");
-    console.log("current time:", currentHour, "image src: ", images[currentHour])
+    timeSlider.value = currentHour.toString();
+    //console.log("current time:", currentHour, "image src: ", images[currentHour])
 }
 
 function startAnimation() {
     interval = setInterval(() => {
-        currentHour = (currentHour + 1) % images.length; // Loop through the images
+        updateCurrentHour((currentHour + 1) % images.length); // Update the next hour
         updateMap();
     }, 1000);
 }
@@ -60,6 +61,10 @@ function startAnimation() {
 function stopAnimation() {
     clearInterval(interval);
     interval = null;
+}
+
+function updateCurrentHour(hour) {
+    currentHour = Number(hour);
 }
 
 // Event listeners
@@ -79,4 +84,9 @@ datePicker.addEventListener("change", (e) => {
     console.log("Picked date", datePicker.value);
     cDate = new Date();
     console.log(cDate.getDay());
+});
+
+timeSlider.addEventListener("input", (e) => {
+    updateCurrentHour(Number(e.target.value));
+    updateMap();
 });
