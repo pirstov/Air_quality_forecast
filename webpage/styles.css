@@ -34,8 +34,8 @@ label {
 }
 
 #forecast-map {
-    max-width: 300px;
-    max-height: 290px;
+    max-width: 600px;
+    /* max-height: 290px; */
     height: auto;
 }
 
@@ -44,47 +44,67 @@ label {
     max-width: 100%;
 }
 
+/* Timeline controls */
 .timeline-controls {
-    margin-top: 10px;
-    display: inline-block;/* Row display */
+    /* margin-top: 10px; */
+    display: flex;
+    gap: 10px;
+    width: 100%;
 }
 
-.timestep-container {
-    margin-left: 0px;
-    margin-right: 0px;
-    margin-bottom: 0px;
-    padding-left: 0px;
-    padding-right: 0px;
-}
-
-button {
+#toggle-play {
     padding: 8px 15px;
     font-size: 16px;
+    width: 80px;
+    text-align: center;
     background: #55bfd0;
     color: #f4f4f4;
     border: none;
     cursor: pointer;
 }
 
-button:hover {
+#toggle-play:hover {
     background: #005bb5;
 }
- 
-.time-step {
-    width: 20px; 
-    height: 20px;
-    display: inline-block; /* Row display */
-    margin: 5px;
-    padding: 8px 15px;
-    background: #55bfd0;
-    color: white;
-    border: none;
-    cursor: pointer;
+
+#time-slider {
+    flex-grow: 1;
 }
 
+/* The slider itself */
+.slider {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    width: 100%; /* Full-width */
+    /* height: 25px; /* Specified height */
+    background: #55bfd0; /* Grey background */
+    outline: none; /* Remove outline */
+}
+
+/* Style the slider handle (mozilla) */
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 100%;
+    background: #005bb5; /* Background color */
+    cursor: pointer; /* Cursor on hover */
+    border: none; /* Remove implicit border */
+    border-radius: 0; /* Remove rounded edges */
+}
+
+/* Style the slider handle (other browsers) */
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 100%;
+    background: #005bb5;
+    cursor: pointer;
+    border: none;
+    border-radius: 0;
+}
+ /* */
 
 /* Navigation bar */
-
 /* Add a background color to the top navigation */
 .topnav {
     background-color: #55bfd0;
@@ -112,5 +132,24 @@ color: #f4f4f4;
 background-color: #005bb5;
 color: #f4f4f4;
 }
+/* */
 
+/* Evaluation plots */
+
+.eval-container {
+    /* position: relative;
+    text-align: center;
+    max-width: 600px;
+    max-height: auto; */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.eval-container img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
 /* */
