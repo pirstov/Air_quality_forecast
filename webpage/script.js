@@ -9,7 +9,6 @@ let interval = null; // Function that repeatedly calls updateMap
 // Elements
 const forecastMap = document.getElementById("forecast-map");
 const toggleBtn = document.getElementById("toggle-play");
-//const timestepContainer = document.getElementById("timestep-container");
 const timeSlider = document.getElementById("time-slider");
 const currentTime = document.getElementById("current-time");
 const datePicker = document.getElementById("date");
@@ -26,16 +25,10 @@ datePicker.min = startOfWeek.toISOString().split("T")[0]; // Dates need to be st
 datePicker.max = currentDate.toISOString().split("T")[0];
 
 // TODO: load images based on the forecast length
-// Add time steps and add images to the images array
+// Load one day data
 for (let i = 0; i < totHours; i++) {
-    const hour = (i + 1).toString().padStart(2, "0");
-    //console.log(hour);
+    const hour = i.toString().padStart(2, "0");
     images.push(`pm_plots/20240220_${hour}.png`);
-    //const timeStep = document.createElement("div");
-    //timeStep.classList.add("time-step");
-    //timeStep.textContent = hour;
-    //timeStep.addEventListener("click", () => goToHour(i)); // TODO: Add time step button functionality
-    //timestepContainer.appendChild(timeStep);
 }
 
 // Set default plot
@@ -44,20 +37,19 @@ forecastMap.src = "pm_plots/20240220_00.png"
 // Initialize slider
 timeSlider.max = images.length - 1;
 timeSlider.step = 1;
+console.log("images.length:", images.length);
 
 // Functions
 function updateMap() {
-    console.log("current time:", currentHour);
     forecastMap.src = images[currentHour];
     document.getElementById("hour-display").textContent=(currentHour + 1).toString().padStart(2, "0");
-    console.log("image src: ", images[currentHour])
+    console.log("current time:", currentHour, "image src: ", images[currentHour])
 }
 
 function startAnimation() {
     interval = setInterval(() => {
-        currentHour = (currentHour + 1) % totHours; // Loop through the images
+        currentHour = (currentHour + 1) % images.length; // Loop through the images
         updateMap();
-        //updateTimesteps(); // TODO: highlight the current timestep
     }, 1000);
 }
 
