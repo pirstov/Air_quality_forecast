@@ -1,0 +1,4 @@
+# skip test images for the website
+webpage/pm_plots/
+webpage/europe_placeholder.png
+
