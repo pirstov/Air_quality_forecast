@@ -29,13 +29,14 @@
 
             <label for="source">Area:</label>
             <select id="source">
-                <option value="source1">Source 1</option>
-                <option value="source2">Source 2</option>
+                <option value="source1">Finland</option>
+                <option value="source2">Europe</option>
             </select>
         </div>
 
         <div class="map-container">
-            <img id="forecast-map" src="" alt="Image player">
+            <img id="air-quality-map" class="map" src="" alt="Image player">
+            <img id="meteo-map" class="map" src="" alt="Image player">
             <div class="current-time">
                 <span id="hour-display"></span>
             </div>
@@ -45,6 +46,7 @@
                 <input type="range" id="time-slider" class="slider" min=0 max=0 step="1">
             </div>
         </div>
+
     </main>
 
     <script src="common.js"></script>

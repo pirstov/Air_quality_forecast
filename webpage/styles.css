@@ -30,16 +30,17 @@ label {
 
 .map-container {
     position: relative;
+    display: inline-block;
     text-align: center;
 }
 
-#forecast-map {
+.map {
     max-width: 600px;
     /* max-height: 290px; */
     height: auto;
 }
 
-#forecast-map img {
+.map img {
     max-height: 100%;
     max-width: 100%;
 }
@@ -102,7 +103,8 @@ label {
     border: none;
     border-radius: 0;
 }
- /* */
+/* */
+
 
 /* Navigation bar */
 /* Add a background color to the top navigation */
