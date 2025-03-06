@@ -5,7 +5,7 @@ import cartopy.feature as cfeature
 import xarray as xr
 from datetime import datetime, timedelta
 import os
-import imageio
+import cv2
 import glob
 
 # Base directory for NetCDF files
@@ -30,7 +30,7 @@ filename = os.path.basename(file_path)
 date_str = filename.split("_")[2]  
 start_time = datetime.strptime(date_str, "%Y%m%d%H")
 
-# Define pollutants with improved colormaps
+# Define pollutants with high-contrast colormaps
 variables = {
     "PM2.5": {"name": "PM$_{2.5}$", "cmap": "coolwarm"},
     "PM10": {"name": "PM$_{10}$", "cmap": "cividis"},
@@ -40,13 +40,14 @@ variables = {
 
 # Function to dynamically determine color scale
 def get_vmin_vmax(data):
-    """Calculate the min-max range for better contrast scaling."""
-    return np.nanpercentile(data, 5), np.nanpercentile(data, 95)  # 5th-95th percentile range
+    """Calculate min-max range for better contrast scaling."""
+    return np.nanpercentile(data, 5), np.nanpercentile(data, 95)  # Use 5th-95th percentile range
 
-# Function to create clearer GIFs
-def create_gif(ds, var_name, props, start_time, gif_output):
-    """Generates a GIF for a single pollutant with improved color clarity."""
+# Function to create video with pause functionality
+def create_video(ds, var_name, props, start_time, video_output):
+    """Generates an .mp4 video for a single pollutant with high-quality playback."""
     images = []
+    fps = 5  # Frames per second (adjust as needed)
 
     for i in range(72):  
         data_time = start_time + timedelta(hours=i)
@@ -64,7 +65,7 @@ def create_gif(ds, var_name, props, start_time, gif_output):
         # Dynamically determine vmin and vmax
         vmin, vmax = get_vmin_vmax(sub)
 
-        # Create the plot with improved colormap
+        # Create the plot
         c = ax.pcolormesh(ds.nav_lon, ds.nav_lat, sub, cmap=props["cmap"], transform=ccrs.PlateCarree(),
                           shading='gouraud', vmin=vmin, vmax=vmax)
 
@@ -78,21 +79,29 @@ def create_gif(ds, var_name, props, start_time, gif_output):
 
         plt.tight_layout()
 
-        # Save frame to memory instead of disk
+        # Save frame as image
         fig.canvas.draw()
         image = np.array(fig.canvas.renderer.buffer_rgba())
         images.append(image)
 
-        plt.close(fig)  # Close figure to free memory
+        plt.close(fig)  # Free memory
 
     if not images:
-        print(f"No valid images generated for {var_name}. Skipping GIF creation.")
-        return  # Exit function if no valid images
+        print(f"No valid frames generated for {var_name}. Skipping video creation.")
+        return
 
-    imageio.mimsave(gif_output, images, format='GIF', duration=0.5)
-    print(f"GIF created: {gif_output}")
+    # Convert images to video using OpenCV
+    height, width, _ = images[0].shape
+    video_writer = cv2.VideoWriter(video_output, cv2.VideoWriter_fourcc(*"mp4v"), fps, (width, height))
 
-# Generate GIFs for each pollutant with clearer colors
+    for img in images:
+        video_writer.write(cv2.cvtColor(img, cv2.COLOR_RGBA2BGR))  # Convert RGBA to BGR for OpenCV
+
+    video_writer.release()
+    print(f"Video created: {video_output}")
+
+# Generate videos for each pollutant
 for var, props in variables.items():
-    gif_filename = f"{var}_forecast.gif"
-    create_gif(ds, var, props, start_time, gif_filename)
+    video_filename = f"{var}_forecast.mp4"
+    create_video(ds, var, props, start_time, video_filename)
+ 
