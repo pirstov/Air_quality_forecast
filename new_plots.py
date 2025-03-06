@@ -25,22 +25,27 @@ except FileNotFoundError:
     print(f"Error: Unable to open {file_path}.")
     exit()
 
-# Extract start time from the filename
+# Extract start time from filename
 filename = os.path.basename(file_path)
 date_str = filename.split("_")[2]  
 start_time = datetime.strptime(date_str, "%Y%m%d%H")
 
-# Define variables to process
+# Define pollutants with improved colormaps
 variables = {
-    "PM2.5": {"name": "PM$_{25}$", "vmin": 0, "vmax": 20, "cmap": "magma_r"},
-    "PM10": {"name": "PM$_{10}$", "vmin": 0, "vmax": 50, "cmap": "inferno"},
-    "NO2": {"name": "NO$_{2}$", "vmin": 0, "vmax": 50, "cmap": "plasma"},
-    "O3": {"name": "O$_{3}$", "vmin": 0, "vmax": 100, "cmap": "viridis"},
+    "PM2.5": {"name": "PM$_{2.5}$", "cmap": "coolwarm"},
+    "PM10": {"name": "PM$_{10}$", "cmap": "cividis"},
+    "NO2": {"name": "NO$_{2}$", "cmap": "turbo"},
+    "O3": {"name": "O$_{3}$", "cmap": "Spectral"},
 }
 
-# Function to create separate GIFs for each pollutant
+# Function to dynamically determine color scale
+def get_vmin_vmax(data):
+    """Calculate the min-max range for better contrast scaling."""
+    return np.nanpercentile(data, 5), np.nanpercentile(data, 95)  # 5th-95th percentile range
+
+# Function to create clearer GIFs
 def create_gif(ds, var_name, props, start_time, gif_output):
-    """Generates a GIF for a single pollutant without saving image files."""
+    """Generates a GIF for a single pollutant with improved color clarity."""
     images = []
 
     for i in range(72):  
@@ -54,18 +59,22 @@ def create_gif(ds, var_name, props, start_time, gif_output):
         except KeyError:
             print(f"Skipping time step {time_label} for {var_name} - Not found in dataset.")
             plt.close(fig)
-            continue  # Skip to the next time step
+            continue
 
+        # Dynamically determine vmin and vmax
+        vmin, vmax = get_vmin_vmax(sub)
+
+        # Create the plot with improved colormap
         c = ax.pcolormesh(ds.nav_lon, ds.nav_lat, sub, cmap=props["cmap"], transform=ccrs.PlateCarree(),
-                          shading='gouraud', vmin=props["vmin"], vmax=props["vmax"])
+                          shading='gouraud', vmin=vmin, vmax=vmax)
 
         ax.coastlines(color='k', linewidth=1)
         ax.add_feature(cfeature.BORDERS, color='k', linewidth=0.6, alpha=0.3)
-        ax.set_title(f"{props['name']} Concentration\n{time_label}", fontsize=10)
+        ax.set_title(f"{props['name']} Concentration\n{time_label}", fontsize=12, fontweight="bold")
 
         cbar = plt.colorbar(c, ax=ax, fraction=0.05, pad=0.05, extend="both")
-        cbar.set_label(label=f"{props['name']} [µg m$^{-3}$]", fontsize=10)
-        cbar.ax.tick_params(labelsize=9)
+        cbar.set_label(label=f"{props['name']} [µg m$^{-3}$]", fontsize=12, fontweight="bold")
+        cbar.ax.tick_params(labelsize=10)
 
         plt.tight_layout()
 
@@ -83,7 +92,7 @@ def create_gif(ds, var_name, props, start_time, gif_output):
     imageio.mimsave(gif_output, images, format='GIF', duration=0.5)
     print(f"GIF created: {gif_output}")
 
-# Create separate GIFs for each pollutant
+# Generate GIFs for each pollutant with clearer colors
 for var, props in variables.items():
     gif_filename = f"{var}_forecast.gif"
     create_gif(ds, var, props, start_time, gif_filename)
