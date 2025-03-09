@@ -18,6 +18,7 @@ const hourDisplay = document.getElementById("hour-display");
 const mapSelector = document.getElementById("source");
 const paramSelector = document.getElementById("parameter");
 
+
 // Initialization functions
 function initializeDatePicker() {
     // Initialize dates in datepicker
@@ -37,43 +38,42 @@ let param = paramSelector.value;
 let mapSource = mapSelector.value;
 
 function initializeForecast(mapSource, param) {
-    console.log("Called with source", mapSource, "and param", param);
-    if (mapSource === "source1") {
+    imagesAirqMap = [];
+    imagesMeteoMap = [];
+
+    if (mapSource === "source1") { // Finland
         console.log("Initializing map of Finland");
-    } else if (mapSource === "source2") { // TODO: Actual implementation
-        console.log("Initializing placeholder maps of Europe");
-        // Clear current map arrays and fill with correct plots
-        imagesAirqMap = [];
-        imagesMeteoMap = [];
-        imagesAirqMap.push(`europe_placeholder.png`);
-        imagesMeteoMap.push(`europe_placeholder.png`);
+
+        airQualityForecastMap.style.display = "inline-block";
+        meteoMap.style.display = "inline-block"; // Show the meteorological forecast map
+
+        // Load one day data from a fixed path
+        for (let i = 0; i < totHours; i++) {
+            const hour = i.toString().padStart(2, "0");
+            imagesAirqMap.push(`pm_plots/20240220_${hour}.png`);
+            // TODO: Add correct images to meteorological map
+            imagesMeteoMap.push(`pm_plots/20240220_${hour}.png`);
+        }
+
         // Set default plots
-        airQualityForecastMap.src = "europe_placeholder.png";
-        meteoMap.src = "europe_placeholder.png";
-        // Initialize slider
-        timeSlider.value = 0;
-        timeSlider.max = imagesAirqMap.length - 1;
-        timeSlider.step = 1;
+        airQualityForecastMap.src = imagesAirqMap[0]; //"pm_plots/20240220_00.png";
+        meteoMap.src = imagesMeteoMap[0]; //"pm_plots/20240220_00.png";
+
+    } else if (mapSource === "source2") { // Helsinki
+        console.log("Initializing placeholder map of Helsinki");
+        imagesAirqMap.push(`helsinki_placeholder.png`);
+
         console.log("images.length:", imagesAirqMap.length);
 
-        // Initialize hour display
-        hourDisplay.textContent = currentHour.toString().padStart(2, "0");
+        // Set default plot
+        airQualityForecastMap.src = imagesAirqMap[0];
+
+        airQualityForecastMap.style.display = "inline-block";
+        meteoMap.style.display = "none";  // Hide meteorological map for Helsinki
         return;
     } else {
         console.log("Unknown map source:", mapSource);
     }
-
-    // Load one day data from a fixed path
-    for (let i = 0; i < totHours; i++) {
-        const hour = i.toString().padStart(2, "0");
-        imagesAirqMap.push(`pm_plots/20240220_${hour}.png`);
-        // TODO: Add correct images to meteorological map
-        imagesMeteoMap.push(`pm_plots/20240220_${hour}.png`);
-    }
-
-    // Set default plot
-    airQualityForecastMap.src = "pm_plots/20240220_00.png";
-    meteoMap.src = "pm_plots/20240220_00.png";
 
     // Initialize slider
     timeSlider.max = imagesAirqMap.length - 1;
@@ -111,6 +111,7 @@ function stopAnimation() {
 function updateCurrentHour(hour) {
     currentHour = Number(hour);
 }
+
 
 // Event listeners
 toggleBtn.addEventListener("click", () => {

@@ -14,6 +14,7 @@
     <div class="topnav">
         <a href="index.html" target="_self" >Air quality</a>
         <a href="model_eval.html" target="_self">Model evaluation</a>
+        <a href="general.html" target="self">General information</a>
     </div>
 
     <main>
@@ -21,20 +22,22 @@
             <label for="date">Base time</label>
             <input type="date" id="date">
 
+            <label for="source">Area:</label>
+            <select id="source">
+                <option value="source1">Finland</option>
+                <option value="source2">Helsinki</option>
+            </select>
+
             <label for="parameter">Parameter:</label>
             <select id="parameter">
                 <option value="pm25">PM2.5</option>
                 <option value="pm10">PM10</option>
-            </select>
-
-            <label for="source">Area:</label>
-            <select id="source">
-                <option value="source1">Finland</option>
-                <option value="source2">Europe</option>
+                <option value="o3">O3</option>
+                <option value="nox">NOx</option>
             </select>
         </div>
 
-        <div class="map-container">
+        <div id="map-container" class="map-container">
             <img id="air-quality-map" class="map" src="" alt="Image player">
             <img id="meteo-map" class="map" src="" alt="Image player">
             <div class="current-time">

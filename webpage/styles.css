@@ -145,8 +145,9 @@ color: #f4f4f4;
     max-height: auto; */
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 15px 15px; /* gap between rows and columns */
     margin-top: 10px;
+    max-width: 1000px;
 }
 
 .eval-container img {
