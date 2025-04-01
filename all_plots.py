@@ -82,6 +82,7 @@ def create_plot(sub, time_label, output_file, variable_name):
     locations = {
         "Helsinki": (24.9458, 60.1920),
         "Turku": (22.2666, 60.4518),
+        "Tampere": (23.7610, 61.4978),
         "Hyytiälä": (24.2948, 61.8456)
     }
     
@@ -138,7 +139,7 @@ def create_webp_animation(feat):
         return
 
     images = [Image.open(img) for img in image_files]
-    f_out = f"pm_animations/{feat}_animation.webp"
+    f_out = f"animations/{feat}_animation.webp"
     images[0].save(f_out, save_all=True, append_images=images[1:], duration=1000, loop=0)
     print(f"Animation saved as {f_out}")
 
