@@ -176,5 +176,6 @@ paramSelector.addEventListener("change", () => {
     console.log("Param changed, reinitializing map");
     let mapSource = mapSelector.value;
     let param = paramSelector.value;
+    updateCurrentHour(0);
     initializeForecast(mapSource, param);
 });
