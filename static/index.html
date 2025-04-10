@@ -19,14 +19,15 @@
 
     <main>
         <div class="controls">
-            <label for="date">Base time</label>
-            <input type="date" id="date">
-
-            <label for="source">Area:</label>
-            <select id="source">
-                <option value="source1">Finland</option>
-                <option value="source2">Helsinki</option>
-            </select>
+            <div class="date-selection">
+                <form id="date-form">
+                    <fieldset>
+                        <label><input type="radio" name="date" value="20240401">20250401</label><br>
+                        <label><input type="radio" name="date" value="20240402">20250402</label><br>
+                        <label><input type="radio" name="date" value="20240403">20250403</label><br>
+                    </fieldset>
+                </form>
+            </div>
 
             <label for="parameter">Parameter:</label>
             <select id="parameter">
@@ -49,7 +50,6 @@
                 <input type="range" id="time-slider" class="slider" min=0 max=0 step="1">
             </div>
         </div>
-
     </main>
 
     <script src="common.js"></script>

@@ -16,8 +16,9 @@ s3 = boto3.client(
 )
 
 # Access the folder with prefix
-response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix='pm_plots', MaxKeys=50)
-print(response)
+#response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix='pm_plots', MaxKeys=50)
+# Regex to match the forecast plot data
+filename_pattern_fcast = re.compile(r'.*_(\d{4}-\d{2}-\d{2})_\d{2}\.png')
 
 #app = Flask(__name__, static_folder='static')
 app = Flask(__name__, static_folder='static', static_url_path='')
@@ -38,7 +39,31 @@ def model_eval():
 def general():
     return app.send_static_file('general.html')
 
-# Regex to match the pm plot data
-filename_pattern = re.compile(r'.*_(\d{4}-\d{2}-\d{2})_\d{2}\.png')
+def get_available_dates():
+    response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix='pm_plots')
+    dates = set()
 
-#print(response)
+    print(response)
+
+    for obj in response.get('Contents', []):
+        key = obj['Key']
+        match = filename_pattern_fcast.match(key)
+        if match:
+            dates.add(match.group(1))  # YYYYMMDD
+
+    sorted_dates = sorted(dates, reverse=True)
+    return sorted_dates
+
+@app.route('/available-dates')
+def list_available_dates():
+    try:
+        return jsonify(get_available_dates())
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+if __name__ == '__main__':
+    print("Testing to fetch available dates:")
+    print(get_available_dates())
+    #app.run(debug=True)
+
