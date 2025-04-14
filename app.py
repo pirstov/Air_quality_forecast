@@ -1,7 +1,8 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from flask import Flask, send_from_directory, jsonify, send_file
+from flask import Flask, request, jsonify, send_file
+import base64
 import boto3
 import os
 import re
@@ -39,17 +40,88 @@ def model_eval():
 def general():
     return app.send_static_file('general.html')
 
+@app.route('/get-forecast-plots')
+def get_forecast_plots():
+    variable = request.args.get('variable')
+    prefix = f'pm_plots/{variable}_'
+
+    response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix)
+    contents = response.get('Contents', [])
+
+    if not contents:
+        return jsonify({'error': 'No images found for the given variable'}), 404
+
+    images = []
+    for obj in contents:
+        key = obj['Key']
+        
+        url = s3.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': BUCKET_NAME, 'Key': key},
+            ExpiresIn=3600  # valid for 1 hour
+        )
+        
+        images.append({
+            'key': key,
+            'url': url
+        })
+
+        #s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=key)
+        #img_bytes = s3_object['Body'].read()
+        #img_base64 = base64.b64encode(img_bytes).decode('utf-8')
+        #images.append({
+        #    'key': key,
+        #    'image': img_base64
+        #})
+
+    return jsonify(images)
+    #response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix='pm_plots')
+    #keys = [obj["Key"] for obj in response.get("Contents", [])]
+    #return jsonify(keys)
+
+@app.route('/get-meteo-plots')
+def get_meteo_plots():
+    prefix = f'pressure_plots/'
+
+    response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix)
+    contents = response.get('Contents', [])
+
+    if not contents:
+        return jsonify({'error': 'No images found'}), 404
+
+    images = []
+    for obj in contents:
+        key = obj['Key']
+        url = s3.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': BUCKET_NAME, 'Key': key},
+            ExpiresIn=3600  # valid for 1 hour
+        )
+        
+        images.append({
+            'key': key,
+            'url': url
+        })
+        
+        #s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=key)
+        #img_bytes = s3_object['Body'].read()
+        #img_base64 = base64.b64encode(img_bytes).decode('utf-8')
+        #images.append({
+        #    'key': key,
+        #    'image': img_base64
+        #})
+
+    return jsonify(images)
+
 def get_available_dates():
     response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix='pm_plots')
     dates = set()
-
-    print(response)
 
     for obj in response.get('Contents', []):
         key = obj['Key']
         match = filename_pattern_fcast.match(key)
         if match:
-            dates.add(match.group(1))  # YYYYMMDD
+            dates.add(match.group(1))
 
     sorted_dates = sorted(dates, reverse=True)
     return sorted_dates

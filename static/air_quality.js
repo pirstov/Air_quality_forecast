@@ -16,13 +16,14 @@ const meteoMap = document.getElementById("meteo-map");
 const toggleBtn = document.getElementById("toggle-play");
 const timeSlider = document.getElementById("time-slider");
 const currentTime = document.getElementById("current-time");
-const datePicker = document.getElementById("date");
+//const datePicker = document.getElementById("date");
 const hourDisplay = document.getElementById("hour-display");
-const mapSelector = document.getElementById("source");
+//const mapSelector = document.getElementById("source");
 const paramSelector = document.getElementById("parameter");
 
 
 // Initialization functions
+/*
 function initializeDatePicker() {
     // Initialize dates in datepicker
     // TODO: fetch the data and show dates based on the data, later just list of dates?
@@ -34,12 +35,52 @@ function initializeDatePicker() {
     datePicker.min = startOfWeek.toISOString().split("T")[0]; // Dates need to be strings
     datePicker.max = currentDate.toISOString().split("T")[0];
 }
+*/
 
 // Read in the selected parameter
 let param = paramSelector.value;
 // Read in the source to determine which map to show
-let mapSource = mapSelector.value;
+//let mapSource = mapSelector.value;
 
+function updateForecast(plots, param) {
+    console.log("Updating forecast for param:", param);
+
+    // Reset forecast vectors
+    imagesAirqMap = [];
+    //imagesMeteoMap = [];
+    currentHour = 0;
+
+    plots.forEach((plot, index) => {
+        //const imgSrc = `data:image/png;base64,${plot.image}`;
+        const imgSrc = plot.url;
+        imagesAirqMap.push(imgSrc);
+        //imagesMeteoMap.push(imgSrc); // You can change this if you fetch separate meteo plots
+    });
+
+    // Set first images
+    airQualityForecastMap.src = imagesAirqMap[0];
+
+    // Slider settings
+    timeSlider.value = 0;
+    timeSlider.max = imagesAirqMap.length - 1;
+    timeSlider.step = 1;
+
+    // Hour display
+    updateCurrentHour(0);
+}
+
+function updateMeteoMap(plots) {
+    imagesMeteoMap = [];
+
+    plots.forEach((plot, index) => {
+        const imgSrc = plot.url;
+        imagesMeteoMap.push(imgSrc);
+    })
+
+    meteoMap.src = imagesMeteoMap[0];
+}
+
+/*
 function initializeForecast(mapSource, param) {
     imagesAirqMap = [];
     imagesMeteoMap = [];
@@ -64,19 +105,6 @@ function initializeForecast(mapSource, param) {
         // Set default plots
         airQualityForecastMap.src = imagesAirqMap[0];
         meteoMap.src = imagesMeteoMap[0];
-
-    } else if (mapSource === "source2") { // Helsinki
-        console.log("Initializing placeholder map of Helsinki");
-        imagesAirqMap.push(`helsinki_placeholder.png`);
-
-        console.log("images.length:", imagesAirqMap.length);
-
-        // Set default plot
-        airQualityForecastMap.src = imagesAirqMap[0];
-
-        airQualityForecastMap.style.display = "inline-block";
-        meteoMap.style.display = "none";  // Hide meteorological map for Helsinki
-        return;
     } else {
         console.log("Unknown map source:", mapSource);
     }
@@ -90,9 +118,10 @@ function initializeForecast(mapSource, param) {
     // Initialize hour display
     //hourDisplay.textContent = currentHour.toString().padStart(2, "0");
 }
+*/
 
-initializeDatePicker();
-initializeForecast(mapSource, param);
+//initializeDatePicker();
+//initializeForecast(mapSource, param);
 
 // Functions
 function updateMap() {
@@ -126,6 +155,7 @@ function clearOptions(selectElement) {
     }
  }
 
+/*
 function updateParamList(mapSource) {
     if (mapSource === "source1") {
         clearOptions(paramSelector);
@@ -139,6 +169,7 @@ function updateParamList(mapSource) {
         }
     }
 }
+*/
 
 // Event listeners
 toggleBtn.addEventListener("click", () => {
@@ -153,17 +184,20 @@ toggleBtn.addEventListener("click", () => {
     }
 });
 
+/*
 datePicker.addEventListener("change", (e) => {
     console.log("Picked date", datePicker.value);
     cDate = new Date();
     console.log(cDate.getDay());
 });
+*/
 
 timeSlider.addEventListener("input", (e) => {
     updateCurrentHour(Number(e.target.value));
     updateMap();
 });
 
+/*
 mapSelector.addEventListener("change", () => {
     console.log("Map source changed, reinitializing map and updating param list");
     let mapSource = mapSelector.value;
@@ -171,11 +205,56 @@ mapSelector.addEventListener("change", () => {
     initializeForecast(mapSource, param);
     updateParamList(mapSource);
 });
+*/
 
 paramSelector.addEventListener("change", () => {
     console.log("Param changed, reinitializing map");
-    let mapSource = mapSelector.value;
+    //let mapSource = mapSelector.value;
     let param = paramSelector.value;
+
+    // Send the selected param to your backend
+    fetch(`/get-forecast-plots?variable=${param}`)
+        .then(response => response.json())
+        .then(images => {
+            console.log("Images returned from backend:", images);
+
+            // You can now pass this to your image display logic
+            updateForecast(images, param);
+        })
+        .catch(error => {
+            console.error("Error fetching images:", error);
+        });
+
+
     updateCurrentHour(0);
-    initializeForecast(mapSource, param);
+    //initializeForecast(mapSource, param);
+});
+
+// Load data for default parameter
+window.addEventListener("DOMContentLoaded", () => {
+    const defaultParam = "PM25"; // Default variable
+    paramSelector.value = defaultParam; // Preselect in dropdown
+
+    console.log("loading default images for ", defaultParam);
+
+    fetch(`/get-forecast-plots?variable=${defaultParam}`)
+        .then(response => response.json())
+        .then(images => {
+            console.log("Default images loaded");
+            updateForecast(images, defaultParam);
+            updateCurrentHour(0);
+        })
+        .catch(error => {
+            console.error("Error loading default images:", error);
+        });
+    
+    fetch(`get-meteo-plots`)
+        .then(response => response.json())
+        .then(images => {
+            console.log("Meteorological map loaded");
+            updateMeteoMap(images);
+        })
+        .catch(error => {
+            console.error("Error loading meteorological forecast data:", error);
+        })
 });
