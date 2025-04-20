@@ -66,18 +66,7 @@ def get_forecast_plots():
             'url': url
         })
 
-        #s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=key)
-        #img_bytes = s3_object['Body'].read()
-        #img_base64 = base64.b64encode(img_bytes).decode('utf-8')
-        #images.append({
-        #    'key': key,
-        #    'image': img_base64
-        #})
-
     return jsonify(images)
-    #response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix='pm_plots')
-    #keys = [obj["Key"] for obj in response.get("Contents", [])]
-    #return jsonify(keys)
 
 @app.route('/get-meteo-plots')
 def get_meteo_plots():
@@ -102,14 +91,6 @@ def get_meteo_plots():
             'key': key,
             'url': url
         })
-        
-        #s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=key)
-        #img_bytes = s3_object['Body'].read()
-        #img_base64 = base64.b64encode(img_bytes).decode('utf-8')
-        #images.append({
-        #    'key': key,
-        #    'image': img_base64
-        #})
 
     return jsonify(images)
 
