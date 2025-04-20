@@ -6,6 +6,7 @@ import base64
 import boto3
 import os
 import re
+from datetime import datetime
 
 BUCKET_NAME = '2012160-mahti-SCRATCH'
 
@@ -127,6 +128,54 @@ def get_meteo_plots():
         })
 
     return jsonify(images)
+
+@app.route('/get-validation-plots')
+def get_validation_plots():
+    bucket = 'AQ_validation'
+    prefix = 'validation_'
+    response = s3.list_objects_v2(Bucket=bucket, Prefix=prefix)
+    contents = response.get('Contents', [])
+
+    if not contents:
+        return jsonify({'error': 'No images found'}), 404
+
+    # Match only with pngs of the given format
+    pattern = re.compile(r'validation_(\w+)_([0-9]{8})\.png')
+
+    latest_plots = {}
+    
+    for obj in contents:
+        key = obj['Key']
+        match = pattern.match(key)
+        if match:
+            param, date_str = match.groups()
+            try:
+                date_obj = datetime.strptime(date_str, '%Y%m%d')
+                # Add only the plots with most recent date
+                if (param not in latest_plots) or (date_obj > latest_plots[param]['date']):
+                    latest_plots[param] = {
+                        'key': key,
+                        'date': date_obj
+                    }
+            except ValueError:
+                continue  # Skip files without date
+
+    images = []
+    for param, info in latest_plots.items():
+        key = info['key']
+        url = s3.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': bucket, 'Key': key},
+            ExpiresIn=3600
+        )
+        images.append({
+            'param': param,
+            'key': key,
+            'url': url
+        })
+
+    return jsonify(images)
+
 
 def get_available_dates():
     response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix='pm_plots')
