@@ -68,9 +68,38 @@ def get_forecast_plots():
 
     return jsonify(images)
 
+@app.route('/get-aerosol-plots')
+def get_aerosol_plots():
+    variable = request.args.get('variable')
+    prefix = f'aerosol_plots/{variable}_'
+
+    response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix)
+    contents = response.get('Contents', [])
+
+    if not contents:
+        return jsonify({'error': 'No images found for the given variable'}), 404
+
+    images = []
+    for obj in contents:
+        key = obj['Key']
+        
+        url = s3.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': BUCKET_NAME, 'Key': key},
+            ExpiresIn=3600  # valid for 1 hour
+        )
+        
+        images.append({
+            'key': key,
+            'url': url
+        })
+
+    return jsonify(images)
+
 @app.route('/get-meteo-plots')
 def get_meteo_plots():
-    prefix = f'pressure_plots/'
+    prefix = f'pressure_plots/air_press_'
+    f_pattern = re.compile(r'^pressure_plots/air_press_\d{2}\.png$')
 
     response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix)
     contents = response.get('Contents', [])
@@ -81,6 +110,11 @@ def get_meteo_plots():
     images = []
     for obj in contents:
         key = obj['Key']
+
+        # Filter out files: there were some extra files
+        if not f_pattern.match(key):
+            continue
+
         url = s3.generate_presigned_url(
             'get_object',
             Params={'Bucket': BUCKET_NAME, 'Key': key},

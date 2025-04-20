@@ -30,16 +30,16 @@
             </select>
         </div>
 
-        <div id="map-container" class="map-container">
-            <img id="aerosol-map" class="map" src="" alt="Image player">
-            <img id="meteo-map" class="map" src="" alt="Image player">
+        <div id="aero-map-container" class="map-container">
+            <img id="aerosol-map" loading="eager" class="map" src="" alt="Image player">
+            <img id="aero-meteo-map" loading="eager" class="map" src="" alt="Image player">
             <div class="current-time">
-                <span id="hour-display"></span>
+                <span id="aero-hour-display"></span>
             </div>
 
             <div class="timeline-controls">
-                <button id="toggle-play">Start</button>
-                <input type="range" id="time-slider" class="slider" min=0 max=0 step="1">
+                <button class=toggle-play id="aero-toggle-play">Start</button>
+                <input type="range" id="aero-time-slider" class="slider" min=0 max=0 step="1">
             </div>
         </div>
     </main>

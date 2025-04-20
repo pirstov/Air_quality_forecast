@@ -29,16 +29,16 @@
             </select>
         </div>
 
-        <div id="map-container" class="map-container">
-            <img id="air-quality-map" class="map" src="" alt="Image player">
-            <img id="meteo-map" class="map" src="" alt="Image player">
+        <div id="airq-map-container" class="map-container">
+            <img id="air-quality-map" loading="eager" class="map" src="" alt="Image player">
+            <img id="airq-meteo-map" loading="eager" class="map" src="" alt="Image player">
             <div class="current-time">
-                <span id="hour-display"></span>
+                <span id="airq-hour-display"></span>
             </div>
 
             <div class="timeline-controls">
-                <button id="toggle-play">Start</button>
-                <input type="range" id="time-slider" class="slider" min=0 max=0 step="1">
+                <button class="toggle-play" id="airq-toggle-play">Start</button>
+                <input type="range" id="airq-time-slider" class="slider" min=0 max=0 step="1">
             </div>
         </div>
     </main>

@@ -5,67 +5,110 @@ let totHours = 24; // Show only one day forecast
 let imagesAirqMap = [];
 let imagesMeteoMap = [];
 let interval = null; // Function that repeatedly calls updateMap
+let plotsPreloaded = false;
 
 // Elements
 const airQualityForecastMap = document.getElementById("air-quality-map");
-const meteoMap = document.getElementById("meteo-map");
-const toggleBtn = document.getElementById("toggle-play");
-const timeSlider = document.getElementById("time-slider");
-const currentTime = document.getElementById("current-time");
-const hourDisplay = document.getElementById("hour-display");
+const meteoMap = document.getElementById("airq-meteo-map");
+const toggleBtn = document.getElementById("airq-toggle-play");
+const timeSlider = document.getElementById("airq-time-slider");
+const hourDisplay = document.getElementById("airq-hour-display");
 const paramSelector = document.getElementById("parameter");
 
 
 // Read in the selected parameter
 let param = paramSelector.value;
 
-function updateForecast(plots, param) {
-    console.log("Updating forecast for param:", param);
-
-    // Reset forecast vectors
+function initializeMaps(airq_plots, meteo_plots) {
+    // Reset air quality map vector
     imagesAirqMap = [];
+    imagesMeteoMap = [];
     currentHour = 0;
 
-    plots.forEach((plot, index) => {
+    airq_plots.forEach((plot) => {
         const imgSrc = plot.url;
         imagesAirqMap.push(imgSrc);
     });
 
-    // Set first images
-    airQualityForecastMap.src = imagesAirqMap[0];
+    meteo_plots.forEach((plot) => {
+        const imgSrc = plot.url;
+        imagesMeteoMap.push(imgSrc);
+    });
 
-    // Slider settings
+    // Continue setup only after all images have been loaded to avoid forecast
+    // plots going out of sync
+    Promise.all([
+        preloadImages(imagesAirqMap),
+        preloadImages(imagesMeteoMap)
+    ]).then(() => {
+        plotsPreloaded = true;
+        // Set first images
+        airQualityForecastMap.src = imagesAirqMap[0];
+
+        // Slider settings
+        timeSlider.value = 0;
+        timeSlider.max = imagesAirqMap.length - 1;
+        timeSlider.step = 1;
+
+        // Hour display
+        updateCurrentHour(0);
+    }).catch(err => {
+        console.log("Error initializing forecast plots:", err);        
+    })
+}
+
+function updateForecastMap(airq_plots, param) {
+    console.log("Updating forecast for param:", param);
+
+    imagesAirqMap = [];
+    currentHour = 0;
+
+    airq_plots.forEach((plot) => {
+        const imgSrc = plot.url;
+        imagesAirqMap.push(imgSrc);
+    });
+
+    // Set slider to 0 for both maps after param change
+    airQualityForecastMap.src = imagesAirqMap[0];
+    meteoMap.src = imagesMeteoMap[0];
+
     timeSlider.value = 0;
     timeSlider.max = imagesAirqMap.length - 1;
     timeSlider.step = 1;
 
-    // Hour display
+    // Resetting hour display for debugging
     updateCurrentHour(0);
 }
 
-function updateMeteoMap(plots) {
-    imagesMeteoMap = [];
-
-    plots.forEach((plot, index) => {
-        const imgSrc = plot.url;
-        imagesMeteoMap.push(imgSrc);
-    })
-
-    meteoMap.src = imagesMeteoMap[0];
-}
-
 // Functions
-function updateMap() {
+function updateMaps() {
+    if (!plotsPreloaded) {
+        console.log("Plots not yet preloaded, can't update maps");
+        return;
+    }
+    // console.log("Displaying hour:", currentHour); // debug log
     airQualityForecastMap.src = imagesAirqMap[currentHour];
     meteoMap.src = imagesMeteoMap[currentHour];
     //hourDisplay.textContent = currentHour.toString().padStart(2, "0");
     timeSlider.value = currentHour.toString();
 }
 
+function preloadImages(urls) {
+    plotsPreloaded = false;
+    return Promise.all(urls.map((url) => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = url;
+            img.onload = resolve;
+            img.onerror = reject;
+        });
+    }));
+}
+
 function startAnimation() {
     interval = setInterval(() => {
         updateCurrentHour((currentHour + 1) % imagesAirqMap.length); // Update the next hour
-        updateMap();
+        updateMaps();
     }, 1000);
 }
 
@@ -87,6 +130,11 @@ function clearOptions(selectElement) {
 
 // Event listeners
 toggleBtn.addEventListener("click", () => {
+    // If the plots preloading is not done, do nothing
+    if (!plotsPreloaded) {
+        return;
+    }
+
     isAnimating = !isAnimating;
 
     if (isAnimating) {
@@ -130,24 +178,17 @@ window.addEventListener("DOMContentLoaded", () => {
 
     console.log("loading default images for ", defaultParam);
 
+    Promise.all([
     fetch(`/get-forecast-plots?variable=${defaultParam}`)
-        .then(response => response.json())
-        .then(images => {
-            console.log("Default images loaded");
-            updateForecast(images, defaultParam);
-            updateCurrentHour(0);
-        })
-        .catch(error => {
-            console.error("Error loading default images:", error);
-        });
-    
-    fetch(`get-meteo-plots`)
-        .then(response => response.json())
-        .then(images => {
-            console.log("Meteorological map loaded");
-            updateMeteoMap(images);
-        })
-        .catch(error => {
-            console.error("Error loading meteorological forecast data:", error);
-        })
+            .then(res => res.json()),
+        fetch(`/get-meteo-plots`)
+            .then(res => res.json())
+    ])
+    .then(([forecastData, meteoData]) => {
+        console.log("Both forecast and meteo data loaded");
+        initializeMaps(forecastData, meteoData)
+    })
+    .catch(error => {
+        console.error("Error loading forecast or meteo data:", error);
+    });
 });
