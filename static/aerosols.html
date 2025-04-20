@@ -20,17 +20,18 @@
 
     <main>
         <div class="controls">
-            <label for="parameter">Parameter:</label>
-            <select id="parameter">
-                <option value="PM25">PM2.5</option>
-                <option value="PM10">PM10</option>
-                <option value="O3">O3</option>
-                <option value="NO2">NO2</option>
+            <label for="aerosol">Aerosol:</label>
+            <select id="aerosol">
+                <option value="BCAR">BCAR</option>
+                <option value="NH3">NH3</option>
+                <option value="NO3">NO3</option>
+                <option value="OA">OA</option>
+                <option value="SO4">SO4</option>
             </select>
         </div>
 
         <div id="map-container" class="map-container">
-            <img id="air-quality-map" class="map" src="" alt="Image player">
+            <img id="aerosol-map" class="map" src="" alt="Image player">
             <img id="meteo-map" class="map" src="" alt="Image player">
             <div class="current-time">
                 <span id="hour-display"></span>
