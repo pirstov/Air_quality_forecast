@@ -44,6 +44,7 @@ function initializeMaps(airq_plots, meteo_plots) {
         plotsPreloaded = true;
         // Set first images
         airQualityForecastMap.src = imagesAirqMap[0];
+        meteoMap.src = imagesMeteoMap[0];
 
         // Slider settings
         timeSlider.value = 0;
